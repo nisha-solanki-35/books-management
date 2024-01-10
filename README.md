@@ -1,3 +1,25 @@
+Prerequisites
+Before you begin, ensure that you have the following tools installed on your machine:
+
+Node.js (v20.9.0)
+npm (v10.1.0)
+Git
+
+
+Install Dependencies
+Install the project dependencies using npm:
+npm install
+
+Run the Application
+Now, you can run the React app locally. Execute the following command:
+npm start
+
+This will start the development server, and you should be able to view the app in your web browser at http://localhost:PORTNUMBER.
+
+
+
+========================================================================================================================================
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
