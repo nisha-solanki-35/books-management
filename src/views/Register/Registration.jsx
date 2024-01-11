@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
-import { Container } from '@mui/material'
-import * as yup from 'yup'
+import { Button, Container, TextField } from '@mui/material'
 import { useMyContext } from '../../context/context'
-import { useNavigate } from 'react-router-dom'
 import AlertComponent from '../../components/Alert'
+import { useNavigate } from 'react-router-dom'
+import * as yup from 'yup'
 
 export const validationSchema = yup.object({
   sEmail: yup
@@ -15,51 +13,58 @@ export const validationSchema = yup.object({
     .required('Email is required'),
   sPassword: yup
     .string('Enter your password')
-    .required('Password is required')
+    .min(8, 'Password should be of minimum 8 characters length')
+    .required('Password is required'),
+  sMobileNumber: yup
+    .string('Enter your mobile number')
+    .required('Mobile number is required')
 })
 
-function Login () {
+function Registration () {
   const navigate = useNavigate()
-  const { dispatch, state: { loginSuccessMsg } } = useMyContext()
+  const { dispatch, state: { registrationSuccessMsg } } = useMyContext()
 
   const [alert, setAlert] = useState(false)
   const [success, setSuccess] = useState(false)
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    if (loginSuccessMsg) {
+    if (registrationSuccessMsg) {
       navigate('/dashboard/books', {
-        state: { message: loginSuccessMsg }
+        state: { message: registrationSuccessMsg }
       })
     }
-  }, [loginSuccessMsg])
+  }, [registrationSuccessMsg])
 
   const formik = useFormik({
     initialValues: {
       sEmail: '',
+      sMobileNumber: '',
       sPassword: ''
     },
     validationSchema,
     onSubmit: (values) => {
+      let usersData = []
+      let index
       const users = localStorage.getItem('Users')
-      const user = JSON.parse(users)?.find(
-        (data) => data.sEmail === values?.sEmail
-      )
-      if (user) {
-        const { sEmail, sPassword } = user
-        if (values?.sEmail === sEmail && values?.sPassword === sPassword) {
-          localStorage.setItem('Token', Date.now())
-          dispatch({
-            type: 'LOGIN',
-            payload: {
-              message: 'User logged in successfully'
-            }
-          })
-        }
-      } else {
+      if (users) {
+        usersData = [...JSON.parse(users)]
+        index = usersData?.findIndex(data => data.sEmail === values?.sEmail || data?.sMobileNumber === values?.sMobileNumber)
+      }
+      if (index >= 0) {
         setAlert(true)
         setSuccess(false)
-        setMessage('Please enter a valid credentials')
+        setMessage('User already exist with this Email Id or Mobile number')
+      } else {
+        usersData.push({ ...values, UserId: Date.now() })
+        localStorage.setItem('Users', JSON.stringify(usersData))
+        localStorage.setItem('Token', Date.now())
+        dispatch({
+          type: 'REGISTER',
+          payload: {
+            message: "You've successfully registered"
+          }
+        })
       }
     }
   })
@@ -81,6 +86,25 @@ function Login () {
             marginTop: '15px'
           }}
           value={formik.values.sEmail}
+          variant="standard"
+        />
+        <TextField
+          error={
+            formik.touched.sMobileNumber && Boolean(formik.errors.sMobileNumber)
+          }
+          fullWidth
+          helperText={
+            formik.touched.sMobileNumber && formik.errors.sMobileNumber
+          }
+          id="sMobileNumber"
+          label="Mobile Number"
+          name="sMobileNumber"
+          onBlur={formik.handleBlur}
+          onChange={formik.handleChange}
+          sx={{
+            marginTop: '15px'
+          }}
+          value={formik.values.sMobileNumber}
           variant="standard"
         />
         <TextField
@@ -115,7 +139,7 @@ function Login () {
             type="submit"
             variant="contained"
           >
-            Login
+            Register
           </Button>
         </Container>
       </form>
@@ -123,4 +147,4 @@ function Login () {
   )
 }
 
-export default Login
+export default Registration

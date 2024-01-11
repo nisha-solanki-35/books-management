@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { Suspense } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import Loader from '../components/Loader'
@@ -9,8 +10,9 @@ function PublicRoute ({ element: Component }) {
   if (token) {
     return (
       <Navigate to={
-        pathname === '/login' ||
-        pathname === '/'
+        pathname === '/' ||
+        pathname === '/sign-in' ||
+        pathname === '/sign-up'
           ? '/dashboard/books'
           : pathname}
       />
