@@ -22,19 +22,28 @@ export const validationSchema = yup.object({
 
 function Registration () {
   const navigate = useNavigate()
-  const { dispatch, state: { registrationSuccessMsg } } = useMyContext()
+  const { dispatch, state: { successMsg, errorMsg } } = useMyContext()
 
   const [alert, setAlert] = useState(false)
   const [success, setSuccess] = useState(false)
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    if (registrationSuccessMsg) {
+    if (successMsg) {
       navigate('/dashboard/books', {
-        state: { message: registrationSuccessMsg }
+        state: { message: successMsg }
       })
     }
-  }, [registrationSuccessMsg])
+  }, [successMsg])
+
+  useEffect(() => {
+    if (errorMsg) {
+      setAlert(true)
+      setSuccess(false)
+      setMessage(errorMsg)
+      dispatch({ type: 'CLEAR_MSG' })
+    }
+  }, [errorMsg])
 
   const formik = useFormik({
     initialValues: {
@@ -52,15 +61,18 @@ function Registration () {
         index = usersData?.findIndex(data => data.sEmail === values?.sEmail || data?.sMobileNumber === values?.sMobileNumber)
       }
       if (index >= 0) {
-        setAlert(true)
-        setSuccess(false)
-        setMessage('User already exist with this Email Id or Mobile number')
+        dispatch({
+          type: 'ERROR_MSG',
+          payload: {
+            message: 'User already exist with this Email Id or Mobile number'
+          }
+        })
       } else {
         usersData.push({ ...values, UserId: Date.now() })
         localStorage.setItem('Users', JSON.stringify(usersData))
         localStorage.setItem('Token', Date.now())
         dispatch({
-          type: 'REGISTER',
+          type: 'SUCCESS_MSG',
           payload: {
             message: "You've successfully registered"
           }

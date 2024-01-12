@@ -20,19 +20,28 @@ export const validationSchema = yup.object({
 
 function Login () {
   const navigate = useNavigate()
-  const { dispatch, state: { loginSuccessMsg } } = useMyContext()
+  const { dispatch, state: { successMsg, errorMsg } } = useMyContext()
 
   const [alert, setAlert] = useState(false)
   const [success, setSuccess] = useState(false)
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    if (loginSuccessMsg) {
+    if (successMsg?.length > 0) {
       navigate('/dashboard/books', {
-        state: { message: loginSuccessMsg }
+        state: { message: successMsg }
       })
     }
-  }, [loginSuccessMsg])
+  }, [successMsg])
+
+  useEffect(() => {
+    if (errorMsg?.length > 0) {
+      setAlert(true)
+      setSuccess(false)
+      setMessage(errorMsg)
+      dispatch({ type: 'CLEAR_MSG' })
+    }
+  }, [errorMsg])
 
   const formik = useFormik({
     initialValues: {
@@ -50,16 +59,19 @@ function Login () {
         if (values?.sEmail === sEmail && values?.sPassword === sPassword) {
           localStorage.setItem('Token', Date.now())
           dispatch({
-            type: 'LOGIN',
+            type: 'SUCCESS_MSG',
             payload: {
               message: 'User logged in successfully'
             }
           })
         }
       } else {
-        setAlert(true)
-        setSuccess(false)
-        setMessage('Please enter a valid credentials')
+        dispatch({
+          type: 'ERROR_MSG',
+          payload: {
+            message: 'Please enter a valid credentials'
+          }
+        })
       }
     }
   })

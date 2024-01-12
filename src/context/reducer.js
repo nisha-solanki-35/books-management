@@ -1,14 +1,26 @@
 const reducer = (state = { }, action) => {
   switch (action.type) {
-    case 'REGISTER':
+    case 'SUCCESS_MSG':
       return {
         ...state,
-        registrationSuccessMsg: action.payload.message
+        successMsg: action.payload.message
       }
-    case 'LOGIN':
+    case 'DELETE_SUCCESS_MSG':
       return {
         ...state,
-        loginSuccessMsg: action.payload.message
+        deleteSuccessMsg: action.payload.message
+      }
+    case 'ERROR_MSG':
+      return {
+        ...state,
+        errorMsg: action.payload.message
+      }
+    case 'CLEAR_MSG':
+      return {
+        ...state,
+        errorMsg: '',
+        successMsg: '',
+        deleteSuccessMsg: ''
       }
     case 'BOOKS_LIST':
       return {
