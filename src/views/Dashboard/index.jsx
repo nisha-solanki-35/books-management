@@ -6,7 +6,9 @@ const Dashboard = lazy(() => import('./Dashboard'))
 function DashboardIndex () {
   return (
     <>
-      <Header />
+      <Header
+        heading="Books Management"
+      />
       <Suspense fallback={<Loader />}>
         <Dashboard />
       </Suspense>
