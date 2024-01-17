@@ -5,7 +5,7 @@ import { Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
 const Login = lazy(() => import('./Login'))
 
-function LoginIndex (props) {
+function LoginIndex () {
   return (
     <>
       <Header

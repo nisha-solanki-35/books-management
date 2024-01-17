@@ -8,14 +8,22 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { Button, Dialog, DialogActions, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
 import { v4 as uuid } from 'uuid'
 
+interface Book {
+  nBookId: string
+  sTitle: string
+  sAuthor: string
+  sPublicationYear: string
+  sGenre: string
+}
+
 function Dashboard () {
   const navigate = useNavigate()
   const { dispatch, state: { successMsg, errorMsg, deleteSuccessMsg, booksList } } = useMyContext()
-
+  const unsortable = ['srNo', 'Actions']
   const [alert, setAlert] = useState(false)
   const [success, setSuccess] = useState(false)
   const [message, setMessage] = useState('')
-  const [books, setBooks] = useState([])
+  const [books, setBooks] = useState<Book[]>([])
   const [isOpenConfirmation, setIsOpenConfirmation] = useState(false)
   const [bookId, setBookId] = useState('')
 
@@ -72,7 +80,7 @@ function Dashboard () {
   }, [])
 
   useEffect(() => {
-    if (booksList?.length > 0) {
+    if (booksList && booksList?.length > 0) {
       localStorage.setItem('Books', JSON.stringify(booksList))
       setBooks(booksList)
       dispatch({
@@ -100,7 +108,7 @@ function Dashboard () {
       setMessage(deleteSuccessMsg)
       dispatch({ type: 'CLEAR_MSG' })
       const books = localStorage.getItem('Books')
-      setBooks(JSON.parse(books))
+      setBooks(JSON.parse(books || '[]'))
     }
   }, [deleteSuccessMsg])
 
@@ -113,12 +121,12 @@ function Dashboard () {
     }
   }, [errorMsg])
 
-  const [order, setOrder] = useState('asc')
-  const [orderBy, setOrderBy] = useState('sTitle')
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc')
+  const [orderBy, setOrderBy] = useState<keyof Book>('sTitle')
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
 
-  const handleDelete = (e, BookId) => {
+  const handleDelete = (e: React.MouseEvent, BookId: string) => {
     setBookId(BookId)
     setIsOpenConfirmation(true)
   }
@@ -137,27 +145,27 @@ function Dashboard () {
 
   const handleDeleteConfirmation = () => setIsOpenConfirmation(false)
 
-  const handleRequestSort = (property) => {
+  const handleRequestSort = (property: keyof Book) => {
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
     setOrderBy(property)
   }
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage)
   }
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10))
     setPage(0)
   }
 
-  const sortedRows = books?.slice()?.sort((a, b) => {
+  const sortedRows = books?.slice()?.sort((a:Book, b:Book) => {
     const isAsc = order === 'asc'
     return (isAsc ? a[orderBy] > b[orderBy] : a[orderBy] < b[orderBy]) ? 1 : -1
   })
 
-  const headCells = [
+  const headCells: { id: keyof Book | 'srNo' | 'Actions' ,label: string}[] = [
     { id: 'srNo', label: 'Sr No.' },
     { id: 'sTitle', label: 'Title' },
     { id: 'sAuthor', label: 'Author' },
@@ -168,7 +176,7 @@ function Dashboard () {
 
   return (
     <Container>
-      {alert && <AlertComponent alert={alert} message={message} setAlert={setAlert} success={success} />}
+      {alert && <AlertComponent alert={alert} message={message} setAlert={setAlert as any} success={success} />}
       <div style={{ textAlign: 'right' }}>
         <Button
           onClick={() => navigate('/books/add-book')}
@@ -187,15 +195,18 @@ function Dashboard () {
               {headCells.map((headCell, index) => (
                 <TableCell
                   key={headCell.id + index}
-                  sortDirection={orderBy === headCell.id ? order : false}
+                  sortDirection={orderBy === headCell.id ? order : undefined}
                 >
-                  <TableSortLabel
-                    active={orderBy === headCell.id}
-                    direction={orderBy === headCell.id ? order : 'asc'}
-                    onClick={() => handleRequestSort(headCell.id)}
-                  >
-                    {headCell.label}
-                  </TableSortLabel>
+                  {!unsortable.includes(headCell.id) ? 
+                  (
+                    <TableSortLabel
+                      active={orderBy === headCell.id}
+                      direction={orderBy === headCell.id ? order : 'asc'}
+                      onClick={() => handleRequestSort(headCell.id as keyof Book)}
+                    >
+                      {headCell.label}
+                    </TableSortLabel>
+                    ) : headCell.label}
                 </TableCell>
               ))}
             </TableRow>

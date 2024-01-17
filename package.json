@@ -23,7 +23,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "start-ts": "ts-node src/index.tsx",
+    "build-ts": "tsc && react-scripts build",
+    "test-ts": "react-scripts test --env=jsdom"
   },
   "eslintConfig": {
     "extends": [
@@ -44,11 +47,17 @@
     ]
   },
   "devDependencies": {
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@types/uuid": "^9.0.7",
+    "@typescript-eslint/eslint-plugin": "^6.18.1",
     "eslint": "^8.56.0",
     "eslint-config-standard": "^17.1.0",
+    "eslint-config-standard-with-typescript": "^43.0.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
-    "eslint-plugin-react": "^7.33.2"
+    "eslint-plugin-react": "^7.33.2",
+    "typescript": "^5.3.3"
   }
 }

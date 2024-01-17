@@ -1,9 +1,15 @@
-/* eslint-disable react/prop-types */
-import * as React from 'react'
+import React, { ReactElement } from 'react'
 import Alert from '@mui/material/Alert'
 import { Snackbar } from '@mui/material'
 
-function AlertComponent (props) {
+interface AlertComponentProps {
+  success: boolean
+  message: string
+  alert: boolean
+  setAlert: (type: boolean) => null
+}
+
+function AlertComponent (props: AlertComponentProps): ReactElement {
   const { success, message, alert, setAlert } = props
 
   return (

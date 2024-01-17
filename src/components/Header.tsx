@@ -1,9 +1,12 @@
-/* eslint-disable react/prop-types */
 import { AppBar, Box, Typography } from '@mui/material'
 import React from 'react'
 import { useLocation } from 'react-router-dom'
 
-export default function Header (props) {
+interface HeaderProps {
+  heading: string
+};
+
+function Header (props: HeaderProps): JSX.Element {
   const { heading } = props
   const { pathname } = useLocation()
 
@@ -33,3 +36,5 @@ export default function Header (props) {
     </Box>
   )
 }
+
+export default Header

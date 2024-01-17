@@ -1,26 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
-import { Button, Container, TextField } from '@mui/material'
-import { useMyContext } from '../../context/context'
-import AlertComponent from '../../components/Alert'
-import { useNavigate } from 'react-router-dom'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import { Container } from '@mui/material'
 import * as yup from 'yup'
+import { useMyContext } from '../../context/context'
+import { useNavigate } from 'react-router-dom'
+import AlertComponent from '../../components/Alert'
+
+interface FormValues {
+  sEmail: string;
+  sPassword: string;
+}
 
 export const validationSchema = yup.object({
   sEmail: yup
-    .string('Enter your email')
+    .string()
     .email('Enter a valid email')
     .required('Email is required'),
   sPassword: yup
-    .string('Enter your password')
-    .min(8, 'Password should be of minimum 8 characters length')
-    .required('Password is required'),
-  sMobileNumber: yup
-    .string('Enter your mobile number')
-    .required('Mobile number is required')
+    .string()
+    .required('Password is required')
 })
 
-function Registration () {
+function Login () {
   const navigate = useNavigate()
   const { dispatch, state: { successMsg, errorMsg } } = useMyContext()
 
@@ -29,7 +32,7 @@ function Registration () {
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    if (successMsg) {
+    if (successMsg && successMsg?.length > 0) {
       navigate('/dashboard/books', {
         state: { message: successMsg }
       })
@@ -37,7 +40,7 @@ function Registration () {
   }, [successMsg])
 
   useEffect(() => {
-    if (errorMsg) {
+    if (errorMsg && errorMsg?.length > 0) {
       setAlert(true)
       setSuccess(false)
       setMessage(errorMsg)
@@ -48,33 +51,28 @@ function Registration () {
   const formik = useFormik({
     initialValues: {
       sEmail: '',
-      sMobileNumber: '',
       sPassword: ''
-    },
+    } as FormValues,
     validationSchema,
     onSubmit: (values) => {
-      let usersData = []
-      let index
       const users = localStorage.getItem('Users')
-      if (users) {
-        usersData = [...JSON.parse(users)]
-        index = usersData?.findIndex(data => data.sEmail === values?.sEmail || data?.sMobileNumber === values?.sMobileNumber)
-      }
-      if (index >= 0) {
+      const user = JSON.parse(users ?? '[]')?.find((data: FormValues) => data.sEmail === values?.sEmail)
+      if (user) {
+        const { sEmail, sPassword } = user
+        if (values?.sEmail === sEmail && values?.sPassword === sPassword) {
+          localStorage.setItem('Token', Date.now().toString())
+          dispatch({
+            type: 'SUCCESS_MSG',
+            payload: {
+              message: 'User logged in successfully'
+            }
+          })
+        }
+      } else {
         dispatch({
           type: 'ERROR_MSG',
           payload: {
-            message: 'User already exist with this Email Id or Mobile number'
-          }
-        })
-      } else {
-        usersData.push({ ...values, UserId: Date.now() })
-        localStorage.setItem('Users', JSON.stringify(usersData))
-        localStorage.setItem('Token', Date.now())
-        dispatch({
-          type: 'SUCCESS_MSG',
-          payload: {
-            message: "You've successfully registered"
+            message: 'Please enter a valid credentials'
           }
         })
       }
@@ -83,7 +81,7 @@ function Registration () {
 
   return (
     <Container>
-      {alert && <AlertComponent alert={alert} message={message} setAlert={setAlert} success={success} />}
+      {alert && <AlertComponent alert={alert} message={message} setAlert={setAlert as any} success={success} />}
       <form onSubmit={formik.handleSubmit}>
         <TextField
           error={formik.touched.sEmail && Boolean(formik.errors.sEmail)}
@@ -98,25 +96,6 @@ function Registration () {
             marginTop: '15px'
           }}
           value={formik.values.sEmail}
-          variant="standard"
-        />
-        <TextField
-          error={
-            formik.touched.sMobileNumber && Boolean(formik.errors.sMobileNumber)
-          }
-          fullWidth
-          helperText={
-            formik.touched.sMobileNumber && formik.errors.sMobileNumber
-          }
-          id="sMobileNumber"
-          label="Mobile Number"
-          name="sMobileNumber"
-          onBlur={formik.handleBlur}
-          onChange={formik.handleChange}
-          sx={{
-            marginTop: '15px'
-          }}
-          value={formik.values.sMobileNumber}
           variant="standard"
         />
         <TextField
@@ -151,7 +130,7 @@ function Registration () {
             type="submit"
             variant="contained"
           >
-            Register
+            Login
           </Button>
         </Container>
       </form>
@@ -159,4 +138,4 @@ function Registration () {
   )
 }
 
-export default Registration
+export default Login

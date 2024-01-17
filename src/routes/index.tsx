@@ -1,12 +1,13 @@
-import React, { lazy } from 'react'
+import React, { lazy, Suspense } from 'react'
 import { Navigate, useRoutes } from 'react-router-dom'
-const PublicRoute = lazy(() => import('./PublicRoute'))
+const PublicRoute = lazy(async () => import('./PublicRoute'))
 const PrivateRoute = lazy(() => import('./PrivateRoute'))
 const Login = lazy(() => import('../views/Login/index'))
 const Register = lazy(() => import('../views/Register/index'))
 const Dashboard = lazy(() => import('../views/Dashboard/index'))
 const BookOperation = lazy(() => import('../views/Dashboard/BookOperation/index'))
 const NotFound = lazy(() => import('../components/NotFound'))
+const Loader = lazy(() => import('../components/Loader'))
 
 export default function Router () {
   return useRoutes([
@@ -14,7 +15,7 @@ export default function Router () {
       path: '/',
       children: [
         { path: '/', element: <Navigate to="/dashboard/books" /> },
-        { path: '/404', element: <NotFound /> },
+        { path: '/404', element: <Suspense fallback={<Loader />}><NotFound /></Suspense> },
         { path: '*', element: <Navigate to="/404" /> }
       ]
     },

@@ -1,9 +1,12 @@
-/* eslint-disable react/prop-types */
 import React, { Suspense } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import Loader from '../components/Loader'
 
-function PublicRoute ({ element: Component }) {
+interface PublicRouteProps {
+  element: React.ComponentType<any>;
+}
+
+function PublicRoute ({ element: Component }: PublicRouteProps) {
   const token = localStorage.getItem('Token')
   const { pathname } = useLocation()
 

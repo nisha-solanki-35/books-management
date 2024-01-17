@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 import { Button, Container, TextField } from '@mui/material'
@@ -8,10 +8,10 @@ import AlertComponent from '../../../components/Alert'
 import { v4 as uuid } from 'uuid'
 
 const validationSchema = yup.object({
-  sTitle: yup.string('Enter Book Title').required('Required field'),
-  sAuthor: yup.string('Enter Book Author').required('Required field'),
-  sPublicationYear: yup.string('Enter Publication Year').required('Required field'),
-  sGenre: yup.string('Enter Book Genre').required('Required field')
+  sTitle: yup.string().required('Required field'),
+  sAuthor: yup.string().required('Required field'),
+  sPublicationYear: yup.string().required('Required field'),
+  sGenre: yup.string().required('Required field')
 })
 
 function AddUpdateBook () {
@@ -42,7 +42,7 @@ function AddUpdateBook () {
 
   function fetchBookData () {
     const books = localStorage.getItem('Books')
-    const book = JSON.parse(books)?.find(data => data.nBookId === bookId)
+    const book = books ?JSON.parse(books)?.find((data: { nBookId: string }) => data.nBookId === bookId):null
     return {
       sTitle: book?.sTitle,
       sAuthor: book?.sAuthor,
@@ -106,12 +106,12 @@ function AddUpdateBook () {
 
   return (
     <Container>
-      {alert && <AlertComponent alert={alert} message={message} setAlert={setAlert} success={success} />}
+      {alert && <AlertComponent alert={alert} message={message} setAlert={setAlert as any} success={success} />}
       <form onSubmit={formik.handleSubmit}>
         <TextField
           error={formik.touched.sTitle && Boolean(formik.errors.sTitle)}
           fullWidth
-          helperText={formik.touched.sTitle && formik.errors.sTitle}
+          helperText={(formik.touched.sTitle && formik.errors.sTitle) as ReactNode}
           id="sTitle"
           label="Title"
           name="sTitle"
@@ -126,7 +126,7 @@ function AddUpdateBook () {
         <TextField
           error={formik.touched.sAuthor && Boolean(formik.errors.sAuthor)}
           fullWidth
-          helperText={formik.touched.sAuthor && formik.errors.sAuthor}
+          helperText={(formik.touched.sAuthor && formik.errors.sAuthor) as ReactNode}
           id="sAuthor"
           label="Author"
           name="sAuthor"
@@ -141,7 +141,7 @@ function AddUpdateBook () {
         <TextField
           error={formik.touched.sPublicationYear && Boolean(formik.errors.sPublicationYear)}
           fullWidth
-          helperText={formik.touched.sPublicationYear && formik.errors.sPublicationYear}
+          helperText={(formik.touched.sPublicationYear && formik.errors.sPublicationYear) as ReactNode}
           id="sPublicationYear"
           label="Publication Year"
           name="sPublicationYear"
@@ -156,7 +156,7 @@ function AddUpdateBook () {
         <TextField
           error={formik.touched.sGenre && Boolean(formik.errors.sGenre)}
           fullWidth
-          helperText={formik.touched.sGenre && formik.errors.sGenre}
+          helperText={(formik.touched.sGenre && formik.errors.sGenre) as ReactNode}
           id="sGenre"
           label="Genre"
           name="sGenre"
