@@ -1,11 +1,12 @@
 import { Container } from '@mui/system'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import AlertComponent from '../../components/Alert'
 import { useMyContext } from '../../context/context'
 import { useNavigate } from 'react-router-dom'
 import EditIcon from '@mui/icons-material/EditOutlined'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { Button, Dialog, DialogActions, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
+import { Button, Dialog, DialogActions, DialogTitle, FormControl, InputLabel, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { v4 as uuid } from 'uuid'
 
 interface Book {
@@ -26,6 +27,8 @@ function Dashboard () {
   const [books, setBooks] = useState<Book[]>([])
   const [isOpenConfirmation, setIsOpenConfirmation] = useState(false)
   const [bookId, setBookId] = useState('')
+  const [genre, setGenre] = useState('')
+  const prevProps = useRef({ genre }).current
 
   useEffect(() => {
     const Books = localStorage.getItem('Books')
@@ -145,6 +148,23 @@ function Dashboard () {
 
   const handleDeleteConfirmation = () => setIsOpenConfirmation(false)
 
+  useEffect(() => {
+    if (prevProps.genre !== genre) {
+      if (genre === 'All') {
+        const Books = localStorage.getItem('Books')
+        const filteredBooks = Books ? JSON.parse(Books) : null
+        setBooks(filteredBooks)
+      } else {
+        const Books = localStorage.getItem('Books')
+        const filteredBooks = Books ? JSON.parse(Books)?.filter((data: { sGenre: string }) => data.sGenre === genre) : null
+        setBooks(filteredBooks)
+      }
+    }
+    return () => {
+      prevProps.genre = genre
+    }
+  }, [genre])
+
   const handleRequestSort = (property: keyof Book) => {
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
@@ -174,19 +194,49 @@ function Dashboard () {
     { id: 'Actions', label: 'Actions' }
   ]
 
+  const handleChange = (event: SelectChangeEvent) => {
+    setGenre(event.target.value as string)
+  }
+
   return (
     <Container>
       {alert && <AlertComponent alert={alert} message={message} setAlert={setAlert as any} success={success} />}
-      <div style={{ textAlign: 'right' }}>
-        <Button
-          onClick={() => navigate('/books/add-book')}
+      <div style={{ display: 'flex', justifyContent: "space-between", margin: "30px 0" }}>
+        <div>
+        <FormControl
           sx={{
-            margin: '20px 0'
+            marginTop: "20px",
+            width: "200px"
           }}
-          variant="outlined"
         >
-          Add Book
-        </Button>
+          <InputLabel id="demo-simple-select-label">Genre</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={genre}
+            label="Genre"
+            onChange={handleChange}
+          >
+            <MenuItem value="All">All</MenuItem>
+            <MenuItem value="Classics">Classics</MenuItem>
+            <MenuItem value="Mystery">Mystery</MenuItem>
+            <MenuItem value="Fantasy">Fantasy</MenuItem>
+            <MenuItem value="Historical Fiction">Historical Fiction</MenuItem>
+            <MenuItem value="Horror">Horror</MenuItem>
+          </Select>
+        </FormControl>
+        </div>
+        <div>
+          <Button
+            onClick={() => navigate('/books/add-book')}
+            sx={{
+              margin: '20px 0'
+            }}
+            variant="outlined"
+          >
+            Add Book
+          </Button>
+        </div>
       </div>
       <TableContainer component={Paper}>
         <Table>
@@ -272,7 +322,7 @@ function Dashboard () {
         rowsPerPageOptions={[5, 10, 25, 50, 100]}
         sx={{
           position: 'fixed',
-          bottom: '15px'
+          bottom: '15px',
         }}
       />
       <Dialog

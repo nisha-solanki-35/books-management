@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
-import { Button, Container, TextField } from '@mui/material'
+import { Button, Container, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useMyContext } from '../../../context/context'
 import AlertComponent from '../../../components/Alert'
@@ -153,21 +153,28 @@ function AddUpdateBook () {
           value={formik.values.sPublicationYear}
           variant="standard"
         />
-        <TextField
-          error={formik.touched.sGenre && Boolean(formik.errors.sGenre)}
-          fullWidth
-          helperText={(formik.touched.sGenre && formik.errors.sGenre) as ReactNode}
-          id="sGenre"
-          label="Genre"
-          name="sGenre"
-          onBlur={formik.handleBlur}
-          onChange={formik.handleChange}
+        <FormControl
           sx={{
-            marginTop: '15px'
+            marginTop: "20px",
+            width: "200px"
           }}
-          value={formik.values.sGenre}
-          variant="standard"
-        />
+        >
+          <InputLabel id="demo-simple-select-label">Genre</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            name="sGenre"
+            value={formik.values.sGenre}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+          >
+            <MenuItem value="Classics">Classics</MenuItem>
+            <MenuItem value="Mystery">Mystery</MenuItem>
+            <MenuItem value="Fantasy">Fantasy</MenuItem>
+            <MenuItem value="Historical Fiction">Historical Fiction</MenuItem>
+            <MenuItem value="Horror">Horror</MenuItem>
+          </Select>
+        </FormControl>
         <Container
           sx={{
             marginTop: '15px',
