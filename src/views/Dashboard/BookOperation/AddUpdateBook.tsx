@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
-import { Button, Container, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material'
+import { Button, Container, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useMyContext } from '../../../context/context'
 import AlertComponent from '../../../components/Alert'
@@ -158,6 +158,7 @@ function AddUpdateBook () {
             marginTop: "20px",
             width: "200px"
           }}
+          error={formik.touched.sGenre && Boolean(formik.errors.sGenre)}
         >
           <InputLabel id="demo-simple-select-label">Genre</InputLabel>
           <Select
@@ -174,6 +175,7 @@ function AddUpdateBook () {
             <MenuItem value="Historical Fiction">Historical Fiction</MenuItem>
             <MenuItem value="Horror">Horror</MenuItem>
           </Select>
+          {formik.touched.sGenre && Boolean(formik.errors.sGenre) && <FormHelperText sx={{ color: 'red' }}>Required field</FormHelperText>}
         </FormControl>
         <Container
           sx={{
